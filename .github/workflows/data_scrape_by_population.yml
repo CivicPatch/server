@@ -18,8 +18,6 @@ on:
 
 jobs:
   fetch-jurisdictions:
-    environment: env-${{ github.actor }}
-
     runs-on: ubuntu-latest
     outputs:
       matrix: ${{ steps.set-matrix.outputs.matrix }}
@@ -74,7 +72,6 @@ jobs:
           echo "matrix=$(jq -c -s '.' $RUNNER_TEMP/matrix.json)" >> $GITHUB_OUTPUT
 
   run-pipelines:
-    environment: env-${{ github.actor }}
     needs: fetch-jurisdictions
     runs-on: ubuntu-latest
     strategy:
