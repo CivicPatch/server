@@ -83,7 +83,7 @@ jobs:
           TOGETHER_AI_TOKEN: ${{ secrets.TOGETHER_AI_TOKEN }}
 
           CRUDDER_SHARED_TOKEN: ${{ secrets.CRUDDER_SHARED_TOKEN }}
-          CRUDDER_URL: ${{ vars.CRUDDER_URL }}
+          CRUDDER_URL: https://crudder.civicpatch.org 
         run: |
           echo "Running pipeline for jurisdiction: ${{ matrix.jurisdiction.name }}"
           docker compose -f docker-compose.github-actions.yml run --rm civicpatch-cicd poetry run \
