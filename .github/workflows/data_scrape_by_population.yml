@@ -31,36 +31,22 @@ jobs:
         with:
           python-version: "3.11"
 
-      - name: Setup mise
-        uses: jdx/mise-action@v3.2.0
-        with:
-          version: "2025.9.6"
-          cache: true
-          log_level: debug
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Install poetry dependencies
-        run: |
-          mise ls
-          poetry install
-
       - name: Pull docker image
         run: |
-          docker compose -f docker-compose.github-actions.yml pull civicpatch-cicd
           docker compose -f docker-compose.github-actions.yml pull civicpatch-cicd
 
       - name: Fetch jurisdictions
         id: find-jurisdictions
         env:
           CRUDDER_SHARED_TOKEN: ${{ secrets.CRUDDER_SHARED_TOKEN }}
-          CRUDDER_URL: ${{ vars.CRUDDER_URL }}
+          CRUDDER_URL: https://crudder.civicpatch.org
         run: |
           # Create a temporary file to store the jurisdictions
           TMP_FILE="$RUNNER_TEMP/jurisdictions.json"
 
           # Run the CLI command and save the output to the temporary file
-
-          mise get-juds --num-jurisdictions ${{ github.event.inputs.num_jurisdictions }} --state "${{ github.event.inputs.state }}" > "$TMP_FILE"
+          curl -s -X GET "${CRUDDER_URL}/api/jurisdictions/available?num_jurisdictions=${{ github.event.inputs.num_jurisdictions }}&state=${{ github.event.inputs.state }}" \
+            -H "Authorization: ${CRUDDER_SHARED_TOKEN}" > $TMP_FILE
 
           # Use jq to extract the jurisdictions and format them as a JSON array for the matrix
           jq -c '.jurisdictions[] | {id, name, url}' "$TMP_FILE" > "$RUNNER_TEMP/matrix.json"
@@ -81,14 +67,6 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v5
 
-      - name: Setup mise
-        uses: jdx/mise-action@v3.2.0
-        with:
-          version: "2025.9.6"
-          cache: true
-          log_level: debug
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-
       - name: Pull docker image
         run: |
           docker compose -f docker-compose.github-actions.yml pull civicpatch-cicd
@@ -108,7 +86,10 @@ jobs:
           CRUDDER_URL: ${{ vars.CRUDDER_URL }}
         run: |
           echo "Running pipeline for jurisdiction: ${{ matrix.jurisdiction.name }}"
-          mise pipeline-run-cicd \
-            --jurisdiction-id "${{ matrix.jurisdiction.id }}" \
-            --name "${{ matrix.jurisdiction.name }}" \
-            --url "${{ matrix.jurisdiction.url }}"
+          docker compose -f docker-compose.github-actions.yml run --rm civicpatch-cicd poetry run \
+            python src/cli/cli.py \
+              run_pipeline \
+                --jurisdiction-id "${{ matrix.jurisdiction.id }}" \
+                --name "${{ matrix.jurisdiction.name }}" \
+                --url "${{ matrix.jurisdiction.url }}"
+
