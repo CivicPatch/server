@@ -38,15 +38,15 @@ jobs:
       - name: Fetch jurisdictions
         id: find-jurisdictions
         env:
-          CRUDDER_SHARED_TOKEN: ${{ secrets.CRUDDER_SHARED_TOKEN }}
-          CRUDDER_URL: https://crudder.civicpatch.org
+          API_CIVICPATCH_ORG_SHARED_TOKEN: ${{ secrets.API_CIVICPATCH_ORG_SHARED_TOKEN }}
+          API_CIVICPATCH_ORG_URL: https://api.civicpatch.org
         run: |
           # Create a temporary file to store the jurisdictions
           TMP_FILE="$RUNNER_TEMP/jurisdictions.json"
 
           # Run the CLI command and save the output to the temporary file
-          curl -s -X GET "${CRUDDER_URL}/api/jurisdictions/available?num_jurisdictions=${{ github.event.inputs.num_jurisdictions }}&state=${{ github.event.inputs.state }}" \
-            -H "Authorization: ${CRUDDER_SHARED_TOKEN}" > $TMP_FILE
+          curl -s -X GET "${API_CIVICPATCH_ORG_URL}/api/jurisdictions/available?num_jurisdictions=${{ github.event.inputs.num_jurisdictions }}&state=${{ github.event.inputs.state }}" \
+            -H "Authorization: ${API_CIVICPATCH_ORG_SHARED_TOKEN}" > $TMP_FILE
 
           # Use jq to extract the jurisdictions and format them as a JSON array for the matrix
           jq -c '.jurisdictions[] | {id, name, url}' "$TMP_FILE" > "$RUNNER_TEMP/matrix.json"
@@ -83,8 +83,8 @@ jobs:
           OPENAI_TOKEN: ${{ secrets.OPENAI_TOKEN }}
           TOGETHER_AI_TOKEN: ${{ secrets.TOGETHER_AI_TOKEN }}
 
-          CRUDDER_SHARED_TOKEN: ${{ secrets.CRUDDER_SHARED_TOKEN }}
-          CRUDDER_URL: https://crudder.civicpatch.org 
+          API_CIVICPATCH_ORG_SHARED_TOKEN: ${{ secrets.API_CIVICPATCH_ORG_SHARED_TOKEN }}
+          API_CIVICPATCH_ORG_URL: https://api.civicpatch.org
         run: |
           echo "Running pipeline for jurisdiction: ${{ matrix.jurisdiction.name }}"
           docker compose -f docker-compose.github-actions.yml run --rm civicpatch-cicd poetry run \
@@ -93,4 +93,3 @@ jobs:
                 --jurisdiction-id "${{ matrix.jurisdiction.id }}" \
                 --name "${{ matrix.jurisdiction.name }}" \
                 --url "${{ matrix.jurisdiction.url }}"
-
