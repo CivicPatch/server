@@ -51,7 +51,7 @@ jobs:
           OPENAI_TOKEN: ${{ secrets.OPENAI_TOKEN }}
           TOGETHER_AI_TOKEN: ${{ secrets.TOGETHER_AI_TOKEN }}
 
-          API_CIVICPATCH_ORG_SHARED_TOKEN: ${{ secrets.API_CIVICPATCH_ORG_SHARED_TOKEN }}
+          API_CIVICPATCH_ORG_TOKEN: ${{ secrets.API_CIVICPATCH_ORG_TOKEN }}
           API_CIVICPATCH_ORG_URL: https://api.civicpatch.org
         run: |
           docker compose -f docker-compose.github-actions.yml run --rm civicpatch-cicd poetry run \
