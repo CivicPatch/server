@@ -88,7 +88,7 @@ jobs:
         run: |
           echo "Running pipeline for jurisdiction: ${{ matrix.jurisdiction.name }}"
           docker compose -f docker-compose.github-actions.yml run --rm civicpatch-cicd poetry run \
-            python src/cli/cli.py \
+            python src/interfaces/cli/main.py \
               run_pipeline \
                 --jurisdiction-id "${{ matrix.jurisdiction.id }}" \
                 --name "${{ matrix.jurisdiction.name }}" \
