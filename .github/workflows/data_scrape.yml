@@ -55,7 +55,7 @@ jobs:
           API_CIVICPATCH_ORG_URL: https://api.civicpatch.org
         run: |
           docker compose -f docker-compose.github-actions.yml run --rm civicpatch-cicd poetry run \
-              python src/cli/cli.py \
+              python src/interfaces/cli/main.py \
                 run_pipeline \
                 --jurisdiction-id "${{ github.event.inputs.jurisdiction_id }}" \
                 --name "${{ github.event.inputs.name }}" \
