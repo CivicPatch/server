@@ -9,6 +9,7 @@ on:
         type: choice
         options:
           - co
+          - nj
           - wa
       num_jurisdictions:
         description: "Number of jurisdictions to scrape by population (e.g. 10 for top 10)"
