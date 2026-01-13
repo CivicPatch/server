@@ -91,6 +91,6 @@ jobs:
           docker compose -f docker-compose.github-actions.yml run --rm civicpatch-cicd poetry run \
             python src/interfaces/cli/main.py \
               run_pipeline \
-                --jurisdiction-id "${{ matrix.jurisdiction.id }}" \
+                --jurisdiction-ocdid "${{ matrix.jurisdiction.id }}" \
                 --name "${{ matrix.jurisdiction.name }}" \
                 --url "${{ matrix.jurisdiction.url }}"
