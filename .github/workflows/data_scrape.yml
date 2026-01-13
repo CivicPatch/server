@@ -1,4 +1,4 @@
-name: "[manual] - Data Scrape"
+name: "[workflow_dispatch] - Data Scrape"
 
 on:
   workflow_dispatch:
@@ -12,6 +12,9 @@ on:
       url:
         description: "URL of the city council page"
         required: true
+      request_id:
+        description: "If invoking via API, request_id is required to track jobs"
+        required: false
 
 jobs:
   data-scrape:
@@ -60,3 +63,4 @@ jobs:
                 --jurisdiction-id "${{ github.event.inputs.jurisdiction_ocdid }}" \
                 --name "${{ github.event.inputs.name }}" \
                 --url "${{ github.event.inputs.url }}"
+                --request_id "{{ github.event.request_id }}"
