@@ -60,7 +60,7 @@ jobs:
           docker compose -f docker-compose.github-actions.yml run --rm civicpatch-cicd poetry run \
               python src/interfaces/cli/main.py \
                 run_pipeline \
-                --jurisdiction-id "${{ github.event.inputs.jurisdiction_ocdid }}" \
+                --jurisdiction-ocdid "${{ github.event.inputs.jurisdiction_ocdid }}" \
                 --name "${{ github.event.inputs.name }}" \
                 --url "${{ github.event.inputs.url }}"
                 --request_id "{{ github.event.request_id }}"
