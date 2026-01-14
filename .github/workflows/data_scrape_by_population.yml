@@ -34,7 +34,8 @@ jobs:
 
       - name: Pull docker image
         run: |
-          docker compose -f docker-compose.github-actions.yml pull civicpatch-cicd
+          docker compose pull
+          docker images
 
       - name: Fetch jurisdictions
         id: find-jurisdictions
@@ -71,7 +72,7 @@ jobs:
 
       - name: Pull docker image
         run: |
-          docker compose -f docker-compose.github-actions.yml pull civicpatch-cicd
+          docker compose pull
 
       - name: Run data scrape
         env:
@@ -88,7 +89,7 @@ jobs:
           API_CIVICPATCH_ORG_URL: https://api.civicpatch.org
         run: |
           echo "Running pipeline for jurisdiction: ${{ matrix.jurisdiction.name }}"
-          docker compose -f docker-compose.github-actions.yml run --rm civicpatch-cicd poetry run \
+          docker compose run --rm civicpatch-cicd poetry run \
             python src/interfaces/cli/main.py \
               run_pipeline \
                 --jurisdiction-ocdid "${{ matrix.jurisdiction.id }}" \
