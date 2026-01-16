@@ -39,6 +39,10 @@ jobs:
           log_level: debug
           github_token: ${{ secrets.GITHUB_TOKEN }}
 
+      #uses: ScribeMD/docker-cache@0.5.0
+      #with:
+      #  key: docker-${{ steps.get-date.outputs.date }}
+
       - name: Pull docker image
         run: |
           docker compose pull
@@ -65,4 +69,4 @@ jobs:
                 --jurisdiction-ocdid "${{ github.event.inputs.jurisdiction_ocdid }}" \
                 --name "${{ github.event.inputs.name }}" \
                 --url "${{ github.event.inputs.url }}" \
-                --request_id "{{ github.event.request_id }}"
+                --request-id "{{ github.event.request_id }}"
