@@ -1,4 +1,4 @@
-name: "[workflow_dispatch] - Data Scrape"
+name: "[api] - Data Scrape"
 
 on:
   workflow_dispatch:
@@ -46,6 +46,7 @@ jobs:
 
       - name: Run data scrape
         env:
+          CIVICPATCH_SERVER_SOURCE: ${{ vars.CIVICPATCH_SERVER_SOURCE }}
           BRAVE_SEARCH_TOKEN: ${{ secrets.BRAVE_SEARCH_TOKEN }}
           GOOGLE_SEARCH_TOKEN: ${{ secrets.GOOGLE_SEARCH_TOKEN }}
           GOOGLE_SEARCH_ENGINE_ID: ${{ secrets.GOOGLE_SEARCH_ENGINE_ID }}
