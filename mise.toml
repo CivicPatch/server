@@ -1,0 +1,13 @@
+[env]
+_.file = ".env"
+
+[tasks.test-action]
+run = """
+docker compose run --rm civicpatch-cicd poetry run \
+              python src/interfaces/cli/main.py \
+                run_pipeline \
+                --jurisdiction-ocdid "ocd-jurisdiction/country:us/state:nj/place:hoboken/government" \
+                --name "Hoboken city" \
+                --url "https://www.hobokennj.gov/" \
+                --request-id "exam-hoboken"
+"""
