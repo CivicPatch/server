@@ -62,6 +62,8 @@ jobs:
 
           API_CIVICPATCH_ORG_TOKEN: ${{ secrets.API_CIVICPATCH_ORG_TOKEN }}
           API_CIVICPATCH_ORG_URL: https://api.civicpatch.org
+
+          CIVICPATCH_SERVER_SOURCE: ${{ secrets.CIVICPATCH_SERVER_SOURCE }} # Only added because this can get invoked via API
         run: |
           docker compose run --rm civicpatch-cicd poetry run \
               python src/interfaces/cli/main.py \
@@ -69,4 +71,4 @@ jobs:
                 --jurisdiction-ocdid "${{ github.event.inputs.jurisdiction_ocdid }}" \
                 --name "${{ github.event.inputs.name }}" \
                 --url "${{ github.event.inputs.url }}" \
-                --request-id "{{ github.event.request_id }}"
+                --request-id "${{ github.event.request_id }}"
