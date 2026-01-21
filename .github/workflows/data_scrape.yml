@@ -62,8 +62,6 @@ jobs:
 
           API_CIVICPATCH_ORG_TOKEN: ${{ secrets.API_CIVICPATCH_ORG_TOKEN }}
           API_CIVICPATCH_ORG_URL: https://api.civicpatch.org
-
-          CIVICPATCH_SERVER_SOURCE: ${{ secrets.CIVICPATCH_SERVER_SOURCE }} # Only added because this can get invoked via API
         run: |
           docker compose run --rm civicpatch-cicd poetry run \
               python src/interfaces/cli/main.py \
