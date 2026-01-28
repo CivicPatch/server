@@ -18,6 +18,7 @@ on:
 
 jobs:
   data-scrape:
+    timeout-minutes: 30
     environment: env-${{ github.actor }}
 
     runs-on: ubuntu-latest
