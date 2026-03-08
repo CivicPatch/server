@@ -96,6 +96,7 @@ jobs:
           GOOGLE_SEARCH_ENGINE_ID: ${{ secrets.GOOGLE_SEARCH_ENGINE_ID }}
           GOOGLE_GEMINI_TOKEN: ${{ secrets.GOOGLE_GEMINI_TOKEN }}
           TOGETHER_AI_TOKEN: ${{ secrets.TOGETHER_AI_TOKEN }}
+          SERVICE_API_KEY: ${{ secrets.SERVICE_API_KEY }}
         run: |
           echo "Running pipeline for jurisdiction: ${{ matrix.jurisdiction.name }}"
           docker compose run --rm civicpatch-cicd poetry run \
