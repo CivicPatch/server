@@ -3,7 +3,7 @@ _.file = ".env"
 
 [tasks.test-action]
 run = """
-docker compose run --rm civicpatch-cicd poetry run \
+docker compose run --rm civicpatch-cicd uv run \
               python src/interfaces/cli/main.py \
                 run_pipeline \
                 --jurisdiction-ocdid "ocd-jurisdiction/country:us/state:nj/place:hoboken/government" \
