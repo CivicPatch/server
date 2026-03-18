@@ -11,6 +11,7 @@ services:
       - SERVICE_API_KEY
 
       - LOG_LEVEL=${LOG_LEVEL:-INFO}
+      - APP_ROOT=/app
     init: true # https://stackoverflow.com/questions/50634819/xvfb-run-hangs-in-container
     image: ghcr.io/civicpatch/civicpatch-github-actions:latest
     #build:
