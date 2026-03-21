@@ -7,6 +7,8 @@ services:
       - API_CIVICPATCH_ORG_URL
       - SERVICE_API_KEY
 
+      - JOB_RUN_URL
+
       - LOG_LEVEL=${LOG_LEVEL:-INFO}
       - APP_ROOT=/app
     init: true # https://stackoverflow.com/questions/50634819/xvfb-run-hangs-in-container

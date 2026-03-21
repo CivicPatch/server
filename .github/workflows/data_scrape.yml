@@ -53,10 +53,12 @@ jobs:
         env:
           API_CIVICPATCH_ORG_URL: https://api.civicpatch.org
           SERVICE_API_KEY: ${{ secrets.SERVICE_API_KEY }}
+          JOB_RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
 
           GOOGLE_GEMINI_TOKEN: ${{ secrets.GOOGLE_GEMINI_TOKEN }}
           TOGETHER_AI_TOKEN: ${{ secrets.TOGETHER_AI_TOKEN }}
         run: |
+          echo "Job run URL: $JOB_RUN_URL"
           docker compose run --rm civicpatch-cicd python src/interfaces/cli/main.py \
                 run_pipeline \
                 --jurisdiction-ocdid "${{ github.event.inputs.jurisdiction_ocdid }}" \
