@@ -93,8 +93,6 @@ jobs:
           API_CIVICPATCH_ORG_URL: https://api.civicpatch.org
           SERVICE_API_KEY: ${{ secrets.SERVICE_API_KEY }}
 
-          GOOGLE_SEARCH_TOKEN: ${{ secrets.GOOGLE_SEARCH_TOKEN }}
-          GOOGLE_SEARCH_ENGINE_ID: ${{ secrets.GOOGLE_SEARCH_ENGINE_ID }}
           GOOGLE_GEMINI_TOKEN: ${{ secrets.GOOGLE_GEMINI_TOKEN }}
           TOGETHER_AI_TOKEN: ${{ secrets.TOGETHER_AI_TOKEN }}
         run: |
