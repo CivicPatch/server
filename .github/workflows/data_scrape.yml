@@ -64,4 +64,4 @@ jobs:
                 --jurisdiction-ocdid "${{ github.event.inputs.jurisdiction_ocdid }}" \
                 --name "${{ github.event.inputs.name }}" \
                 --url "${{ github.event.inputs.url }}" \
-                --request-id "${{ github.event.request_id }}"
+                --request-id "${{ github.event.inputs.request_id }}"
