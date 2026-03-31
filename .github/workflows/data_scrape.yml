@@ -15,6 +15,9 @@ on:
       request_id:
         description: "If invoking via API, request_id is required to track jobs"
         required: false
+      source_urls:
+        description: "JSON array of specific URLs to scrape (e.g. [\"https://...\"])"
+        required: false
 
 jobs:
   data-scrape:
@@ -64,4 +67,5 @@ jobs:
                 --jurisdiction-ocdid "${{ github.event.inputs.jurisdiction_ocdid }}" \
                 --name "${{ github.event.inputs.name }}" \
                 --url "${{ github.event.inputs.url }}" \
-                --request-id "${{ github.event.inputs.request_id }}"
+                --request-id "${{ github.event.inputs.request_id }}" \
+                --source-urls "${{ github.event.inputs.source_urls }}"
