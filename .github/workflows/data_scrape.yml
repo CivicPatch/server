@@ -18,6 +18,10 @@ on:
       source_urls:
         description: "JSON array of specific URLs to scrape (e.g. [\"https://...\"])"
         required: false
+      mode:
+        description: "Run mode: 'start' (default) or 'resume'"
+        required: false
+        default: "start"
 
 jobs:
   data-scrape:
@@ -64,6 +68,9 @@ jobs:
           GOOGLE_GEMINI_TOKEN: ${{ secrets.GOOGLE_GEMINI_TOKEN }}
           TOGETHER_AI_TOKEN: ${{ secrets.TOGETHER_AI_TOKEN }}
           SOURCE_URLS: ${{ github.event.inputs.source_urls }}
+          STORAGE_ENDPOINT: ${{ secrets.STORAGE_ENDPOINT }}
+          STORAGE_ACCESS_KEY_ID: ${{ secrets.STORAGE_ACCESS_KEY_ID }}
+          STORAGE_SECRET_ACCESS_KEY: ${{ secrets.STORAGE_SECRET_ACCESS_KEY }}
         run: |
           echo "Job run URL: $JOB_RUN_URL"
           docker compose run --rm civicpatch-cicd python src/interfaces/cli/main.py \
@@ -72,4 +79,5 @@ jobs:
                 --name "${{ github.event.inputs.name }}" \
                 --url "${{ github.event.inputs.url }}" \
                 --request-id "${{ github.event.inputs.request_id }}" \
-                --source-urls "$SOURCE_URLS"
+                --source-urls "$SOURCE_URLS" \
+                --mode "${{ github.event.inputs.mode }}"
