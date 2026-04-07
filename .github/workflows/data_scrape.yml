@@ -11,7 +11,7 @@ on:
         required: false
       url:
         description: "URL of the city council page"
-        required: true
+        required: false
       request_id:
         description: "If invoking via API, request_id is required to track jobs"
         required: false
