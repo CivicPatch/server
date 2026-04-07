@@ -27,6 +27,9 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+      - name: Request ${{ inputs.request_id }}
+        run: echo "request_id=${{ inputs.request_id }}"
+
       - name: Checkout repository
         uses: actions/checkout@v5
 
