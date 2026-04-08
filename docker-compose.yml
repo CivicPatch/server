@@ -4,7 +4,7 @@ services:
       - GOOGLE_GEMINI_TOKEN
       - TOGETHER_AI_TOKEN
 
-      - API_CIVICPATCH_ORG_URL
+      - CIVICPATCH_ORG_URL
       - SERVICE_API_KEY
 
       - JOB_RUN_URL

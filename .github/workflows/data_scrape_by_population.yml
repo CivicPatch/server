@@ -48,13 +48,13 @@ jobs:
         id: find-jurisdictions
         env:
           SERVICE_API_KEY: ${{ secrets.SERVICE_API_KEY }}
-          API_CIVICPATCH_ORG_URL: https://civicpatch.org
+          CIVICPATCH_ORG_URL: https://civicpatch.org
         run: |
           # Create a temporary file to store the jurisdictions
           TMP_FILE="$RUNNER_TEMP/jurisdictions.json"
 
           # Run the CLI command and save the output to the temporary file
-          curl -s -X GET "${API_CIVICPATCH_ORG_URL}/api/v1/jurisdictions/available?num_jurisdictions=${{ github.event.inputs.num_jurisdictions }}&state=${{ github.event.inputs.state }}" \
+          curl -s -X GET "${CIVICPATCH_ORG_URL}/api/v1/jurisdictions/available?num_jurisdictions=${{ github.event.inputs.num_jurisdictions }}&state=${{ github.event.inputs.state }}" \
             -H "Authorization: ${SERVICE_API_KEY}" > $TMP_FILE
 
           # Use jq to extract the jurisdictions and format them as a JSON array for the matrix
@@ -90,7 +90,7 @@ jobs:
 
       - name: Run data scrape
         env:
-          API_CIVICPATCH_ORG_URL: https://civicpatch.org
+          CIVICPATCH_ORG_URL: https://civicpatch.org
           SERVICE_API_KEY: ${{ secrets.SERVICE_API_KEY }}
           JOB_RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
 
