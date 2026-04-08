@@ -48,7 +48,7 @@ jobs:
         id: find-jurisdictions
         env:
           SERVICE_API_KEY: ${{ secrets.SERVICE_API_KEY }}
-          API_CIVICPATCH_ORG_URL: https://api.civicpatch.org
+          API_CIVICPATCH_ORG_URL: https://civicpatch.org
         run: |
           # Create a temporary file to store the jurisdictions
           TMP_FILE="$RUNNER_TEMP/jurisdictions.json"
@@ -90,7 +90,7 @@ jobs:
 
       - name: Run data scrape
         env:
-          API_CIVICPATCH_ORG_URL: https://api.civicpatch.org
+          API_CIVICPATCH_ORG_URL: https://civicpatch.org
           SERVICE_API_KEY: ${{ secrets.SERVICE_API_KEY }}
           JOB_RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
 
