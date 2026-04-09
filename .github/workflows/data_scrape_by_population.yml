@@ -23,84 +23,48 @@ jobs:
     runs-on: ubuntu-latest
     outputs:
       matrix: ${{ steps.set-matrix.outputs.matrix }}
-    timeout-minutes: 30
+    timeout-minutes: 5
 
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v5
-
-      - name: Set up Python
-        uses: actions/setup-python@v4
-        with:
-          python-version: "3.11"
-
-      #- name: Cache Docker images.
-      #  uses: ScribeMD/docker-cache@0.5.0
-      #  with:
-      #    key: docker-${{ steps.get-date.outputs.date }}
-
-      - name: Pull docker image
-        run: |
-          docker compose pull
-          docker images
-
       - name: Fetch jurisdictions
         id: find-jurisdictions
         env:
           SERVICE_API_KEY: ${{ secrets.SERVICE_API_KEY }}
           CIVICPATCH_ORG_URL: https://civicpatch.org
         run: |
-          # Create a temporary file to store the jurisdictions
           TMP_FILE="$RUNNER_TEMP/jurisdictions.json"
-
-          # Run the CLI command and save the output to the temporary file
-          curl -s -X GET "${CIVICPATCH_ORG_URL}/api/v1/jurisdictions/available?num_jurisdictions=${{ github.event.inputs.num_jurisdictions }}&state=${{ github.event.inputs.state }}" \
-            -H "Authorization: ${SERVICE_API_KEY}" > $TMP_FILE
-
-          # Use jq to extract the jurisdictions and format them as a JSON array for the matrix
+          curl -sf -X GET "${CIVICPATCH_ORG_URL}/api/v1/jurisdictions/available?num_jurisdictions=${{ github.event.inputs.num_jurisdictions }}&state=${{ github.event.inputs.state }}" \
+            -H "Authorization: ${SERVICE_API_KEY}" > "$TMP_FILE"
           jq -c '.jurisdictions[] | {id, name, url}' "$TMP_FILE" > "$RUNNER_TEMP/matrix.json"
 
       - name: Set matrix
         id: set-matrix
         run: |
-          # Convert the JSON array into a GitHub Actions matrix format
-          echo "matrix=$(jq -c -s '.' $RUNNER_TEMP/matrix.json)" >> $GITHUB_OUTPUT
+          echo "matrix=$(jq -c -s '.' "$RUNNER_TEMP/matrix.json")" >> $GITHUB_OUTPUT
 
-  run-pipelines:
+  create-jobs:
     needs: fetch-jurisdictions
     runs-on: ubuntu-latest
-    timeout-minutes: 30
+    timeout-minutes: 5
     strategy:
       matrix:
         jurisdiction: ${{ fromJson(needs.fetch-jurisdictions.outputs.matrix) }}
       fail-fast: false
     steps:
-      - name: Sleep based on hashed jurisdiction ID 
-        run: |
-          SLEEP_SECONDS=$(( ( $(echo -n "${{ matrix.jurisdiction.id }}" | cksum | awk '{print $1}') % 60 ) ))
-          echo "Sleeping for $SLEEP_SECONDS seconds to avoid rate limiting from Google Search APIs..."
-          sleep $SLEEP_SECONDS
-
-      - name: Checkout repository
-        uses: actions/checkout@v5
-
-      - name: Pull docker image
-        run: |
-          docker compose pull
-
-      - name: Run data scrape
+      - name: Create job for ${{ matrix.jurisdiction.name }}
         env:
-          CIVICPATCH_ORG_URL: https://civicpatch.org
           SERVICE_API_KEY: ${{ secrets.SERVICE_API_KEY }}
-          JOB_RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
-
-          GOOGLE_GEMINI_TOKEN: ${{ secrets.GOOGLE_GEMINI_TOKEN }}
-          OPEN_ROUTER_TOKEN: ${{ secrets.OPEN_ROUTER_TOKEN }}
+          CIVICPATCH_ORG_URL: https://civicpatch.org
+          JURISDICTION_ID: ${{ matrix.jurisdiction.id }}
+          JURISDICTION_NAME: ${{ matrix.jurisdiction.name }}
+          JURISDICTION_URL: ${{ matrix.jurisdiction.url }}
         run: |
-          echo "Running pipeline for jurisdiction: ${{ matrix.jurisdiction.name }}"
-          echo "Job run URL: $JOB_RUN_URL"
-          docker compose run --rm civicpatch-cicd python src/interfaces/cli/main.py \
-              run_pipeline \
-                --jurisdiction-ocdid "${{ matrix.jurisdiction.id }}" \
-                --name "${{ matrix.jurisdiction.name }}" \
-                --url "${{ matrix.jurisdiction.url }}"
+          PAYLOAD=$(jq -n \
+            --arg ocdid "$JURISDICTION_ID" \
+            --arg name "$JURISDICTION_NAME" \
+            --arg url "$JURISDICTION_URL" \
+            '{jurisdiction_ocdid: $ocdid, name: $name, url: $url, dispatch_mode: "remote"}')
+          curl -sf -X POST "${CIVICPATCH_ORG_URL}/api/v1/jobs" \
+            -H "Authorization: ${SERVICE_API_KEY}" \
+            -H "Content-Type: application/json" \
+            -d "$PAYLOAD"
