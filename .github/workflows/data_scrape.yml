@@ -66,7 +66,7 @@ jobs:
           JOB_RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
 
           GOOGLE_GEMINI_TOKEN: ${{ secrets.GOOGLE_GEMINI_TOKEN }}
-          TOGETHER_AI_TOKEN: ${{ secrets.TOGETHER_AI_TOKEN }}
+          OPEN_ROUTER_TOKEN: ${{ secrets.OPEN_ROUTER_TOKEN }}
           SOURCE_URLS: ${{ github.event.inputs.source_urls }}
           STORAGE_ENDPOINT: ${{ secrets.STORAGE_ENDPOINT }}
           STORAGE_ACCESS_KEY_ID: ${{ secrets.STORAGE_ACCESS_KEY_ID }}

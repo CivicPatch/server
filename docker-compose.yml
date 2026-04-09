@@ -2,7 +2,7 @@ services:
   pipelines-cicd:
     environment:
       - GOOGLE_GEMINI_TOKEN
-      - TOGETHER_AI_TOKEN
+      - OPEN_ROUTER_TOKEN
 
       - CIVICPATCH_ORG_URL
       - SERVICE_API_KEY
