@@ -53,7 +53,15 @@ jobs:
 
     steps:
       - name: Request ${{ inputs.request_id }}
-        run: echo "request_id=${{ inputs.request_id }}"
+        env:
+          SERVICE_API_KEY: ${{ secrets.SERVICE_API_KEY }}
+        run: |
+          if [[ -n "${{ inputs.request_id }}" ]]; then
+            curl -s --fail-with-body -X POST "https://civicpatch.org/api/v1/jobs/${{ inputs.request_id }}/run" \
+              -H "Authorization: ${SERVICE_API_KEY}" \
+              -H "Content-Type: application/json" \
+              -d '{"run_id": ${{ github.run_id }}}'
+          fi
 
       - name: Checkout repository
         uses: actions/checkout@v5
