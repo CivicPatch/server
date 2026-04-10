@@ -33,7 +33,7 @@ jobs:
           CIVICPATCH_ORG_URL: https://civicpatch.org
         run: |
           TMP_FILE="$RUNNER_TEMP/jurisdictions.json"
-          curl -sf -X GET "${CIVICPATCH_ORG_URL}/api/v1/jurisdictions/available?num_jurisdictions=${{ github.event.inputs.num_jurisdictions }}&state=${{ github.event.inputs.state }}" \
+          curl -s --fail-with-body -X GET "${CIVICPATCH_ORG_URL}/api/v1/jurisdictions/available?num_jurisdictions=${{ github.event.inputs.num_jurisdictions }}&state=${{ github.event.inputs.state }}" \
             -H "Authorization: ${SERVICE_API_KEY}" > "$TMP_FILE"
           jq -c '.jurisdictions[] | {id, name, url}' "$TMP_FILE" > "$RUNNER_TEMP/matrix.json"
 
@@ -64,7 +64,7 @@ jobs:
             --arg name "$JURISDICTION_NAME" \
             --arg url "$JURISDICTION_URL" \
             '{jurisdiction_ocdid: $ocdid, name: $name, url: $url, dispatch_mode: "remote"}')
-          curl -sf -X POST "${CIVICPATCH_ORG_URL}/api/v1/jobs" \
+          curl -s --fail-with-body -X POST "${CIVICPATCH_ORG_URL}/api/v1/jobs" \
             -H "Authorization: ${SERVICE_API_KEY}" \
             -H "Content-Type: application/json" \
             -d "$PAYLOAD"
