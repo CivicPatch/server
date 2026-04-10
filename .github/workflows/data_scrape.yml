@@ -70,7 +70,7 @@ jobs:
           SOURCE_URLS: ${{ github.event.inputs.source_urls }}
         run: |
           echo "Job run URL: $JOB_RUN_URL"
-          docker compose run --rm civicpatch-cicd python src/interfaces/cli/main.py \
+          docker compose run --rm pipelines-cicd python src/interfaces/cli/main.py \
                 run_pipeline \
                 --jurisdiction-ocdid "${{ github.event.inputs.jurisdiction_ocdid }}" \
                 --name "${{ github.event.inputs.name }}" \
