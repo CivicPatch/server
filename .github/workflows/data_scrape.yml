@@ -1,6 +1,27 @@
 name: "[api] - Data Scrape"
 
 on:
+  workflow_call:
+    inputs:
+      jurisdiction_ocdid:
+        required: true
+        type: string
+      name:
+        required: false
+        type: string
+      url:
+        required: false
+        type: string
+      request_id:
+        required: false
+        type: string
+      source_urls:
+        required: false
+        type: string
+      mode:
+        required: false
+        type: string
+        default: "start"
   workflow_dispatch:
     inputs:
       jurisdiction_ocdid:
@@ -67,14 +88,14 @@ jobs:
 
           GOOGLE_GEMINI_TOKEN: ${{ secrets.GOOGLE_GEMINI_TOKEN }}
           OPEN_ROUTER_TOKEN: ${{ secrets.OPEN_ROUTER_TOKEN }}
-          SOURCE_URLS: ${{ github.event.inputs.source_urls }}
+          SOURCE_URLS: ${{ inputs.source_urls }}
         run: |
           echo "Job run URL: $JOB_RUN_URL"
           docker compose run --rm pipelines-cicd python src/interfaces/cli/main.py \
                 run_pipeline \
-                --jurisdiction-ocdid "${{ github.event.inputs.jurisdiction_ocdid }}" \
-                --name "${{ github.event.inputs.name }}" \
-                --url "${{ github.event.inputs.url }}" \
-                --request-id "${{ github.event.inputs.request_id }}" \
+                --jurisdiction-ocdid "${{ inputs.jurisdiction_ocdid }}" \
+                --name "${{ inputs.name }}" \
+                --url "${{ inputs.url }}" \
+                --request-id "${{ inputs.request_id }}" \
                 --source-urls "$SOURCE_URLS" \
-                --mode "${{ github.event.inputs.mode }}"
+                --mode "${{ inputs.mode }}"

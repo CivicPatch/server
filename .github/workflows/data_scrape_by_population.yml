@@ -13,10 +13,10 @@ on:
           - wa
           - tx
       num_jurisdictions:
-        description: "Number of jurisdictions to scrape by population (e.g. 10 for top 10)"
+        description: "Number of jurisdictions to scrape"
         required: false
-        default: 10
-        type: number
+        default: "10"
+        type: string
 
 jobs:
   fetch-jurisdictions:
@@ -24,47 +24,32 @@ jobs:
     outputs:
       matrix: ${{ steps.set-matrix.outputs.matrix }}
     timeout-minutes: 5
-
     steps:
-      - name: Fetch jurisdictions
-        id: find-jurisdictions
+      - name: Register batch jobs
+        id: set-matrix
         env:
           SERVICE_API_KEY: ${{ secrets.SERVICE_API_KEY }}
           CIVICPATCH_ORG_URL: https://civicpatch.org
         run: |
-          TMP_FILE="$RUNNER_TEMP/jurisdictions.json"
-          curl -s --fail-with-body -X GET "${CIVICPATCH_ORG_URL}/api/v1/jurisdictions/available?num_jurisdictions=${{ github.event.inputs.num_jurisdictions }}&state=${{ github.event.inputs.state }}" \
-            -H "Authorization: ${SERVICE_API_KEY}" > "$TMP_FILE"
-          jq -c '.jurisdictions[] | {id, name, url}' "$TMP_FILE" > "$RUNNER_TEMP/matrix.json"
+          RESPONSE=$(curl -s --fail-with-body -X POST "${CIVICPATCH_ORG_URL}/api/v1/jobs/batch" \
+            -H "Authorization: ${SERVICE_API_KEY}" \
+            -H "Content-Type: application/json" \
+            -d "$(jq -n \
+              --arg state "${{ github.event.inputs.state }}" \
+              --argjson num "${{ github.event.inputs.num_jurisdictions }}" \
+              '{state: $state, num_jurisdictions: $num}')")
+          echo "matrix=$(echo "$RESPONSE" | jq -c '.jurisdictions')" >> $GITHUB_OUTPUT
 
-      - name: Set matrix
-        id: set-matrix
-        run: |
-          echo "matrix=$(jq -c -s '.' "$RUNNER_TEMP/matrix.json")" >> $GITHUB_OUTPUT
-
-  create-jobs:
+  scrape:
     needs: fetch-jurisdictions
-    runs-on: ubuntu-latest
-    timeout-minutes: 5
     strategy:
       matrix:
         jurisdiction: ${{ fromJson(needs.fetch-jurisdictions.outputs.matrix) }}
       fail-fast: false
-    steps:
-      - name: Create job for ${{ matrix.jurisdiction.name }}
-        env:
-          SERVICE_API_KEY: ${{ secrets.SERVICE_API_KEY }}
-          CIVICPATCH_ORG_URL: https://civicpatch.org
-          JURISDICTION_ID: ${{ matrix.jurisdiction.id }}
-          JURISDICTION_NAME: ${{ matrix.jurisdiction.name }}
-          JURISDICTION_URL: ${{ matrix.jurisdiction.url }}
-        run: |
-          PAYLOAD=$(jq -n \
-            --arg ocdid "$JURISDICTION_ID" \
-            --arg name "$JURISDICTION_NAME" \
-            --arg url "$JURISDICTION_URL" \
-            '{jurisdiction_ocdid: $ocdid, name: $name, url: $url, dispatch_mode: "remote"}')
-          curl -s --fail-with-body -X POST "${CIVICPATCH_ORG_URL}/api/v1/jobs" \
-            -H "Authorization: ${SERVICE_API_KEY}" \
-            -H "Content-Type: application/json" \
-            -d "$PAYLOAD"
+    uses: ./.github/workflows/data_scrape.yml
+    with:
+      jurisdiction_ocdid: ${{ matrix.jurisdiction.jurisdiction_ocdid }}
+      name: ${{ matrix.jurisdiction.name }}
+      url: ${{ matrix.jurisdiction.url }}
+      request_id: ${{ matrix.jurisdiction.request_id }}
+    secrets: inherit
