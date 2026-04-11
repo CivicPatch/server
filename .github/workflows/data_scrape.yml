@@ -18,10 +18,6 @@ on:
       source_urls:
         required: false
         type: string
-      mode:
-        required: false
-        type: string
-        default: "start"
   workflow_dispatch:
     inputs:
       jurisdiction_ocdid:
@@ -39,10 +35,6 @@ on:
       source_urls:
         description: "JSON array of specific URLs to scrape (e.g. [\"https://...\"])"
         required: false
-      mode:
-        description: "Run mode: 'start' (default) or 'resume'"
-        required: false
-        default: "start"
 
 jobs:
   data-scrape:
@@ -105,5 +97,4 @@ jobs:
                 --name "${{ inputs.name }}" \
                 --url "${{ inputs.url }}" \
                 --request-id "${{ inputs.request_id }}" \
-                --source-urls "$SOURCE_URLS" \
-                --mode "${{ inputs.mode }}"
+                --source-urls "$SOURCE_URLS"
