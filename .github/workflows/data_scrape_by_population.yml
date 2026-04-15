@@ -32,7 +32,7 @@ jobs:
           SERVICE_API_KEY: ${{ secrets.SERVICE_API_KEY }}
           CIVICPATCH_ORG_URL: https://civicpatch.org
         run: |
-          RESPONSE=$(curl -s --fail-with-body -X POST "${CIVICPATCH_ORG_URL}/api/v1/jobs/batch" \
+          RESPONSE=$(curl -s --fail-with-body -X POST "${CIVICPATCH_ORG_URL}/api/v1/pipeline_runs/batch" \
             -H "Authorization: ${SERVICE_API_KEY}" \
             -H "Content-Type: application/json" \
             -d "$(jq -n \
