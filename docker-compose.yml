@@ -1,6 +1,7 @@
 services:
   pipelines-cicd:
     environment:
+      - APP_ENVIRONMENT=production
       - GOOGLE_GEMINI_TOKEN
       - OPEN_ROUTER_TOKEN
 
