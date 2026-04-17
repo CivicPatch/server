@@ -26,19 +26,15 @@ jobs:
       matrix: ${{ steps.set-matrix.outputs.matrix }}
     timeout-minutes: 5
     steps:
-      - name: Register batch jobs
+      - name: Get scrape candidates
         id: set-matrix
         env:
           SERVICE_API_KEY: ${{ secrets.SERVICE_API_KEY }}
           CIVICPATCH_ORG_URL: https://civicpatch.org
         run: |
-          RESPONSE=$(curl -s --fail-with-body -X POST "${CIVICPATCH_ORG_URL}/api/v1/pipeline_runs/batch" \
-            -H "Authorization: ${SERVICE_API_KEY}" \
-            -H "Content-Type: application/json" \
-            -d "$(jq -n \
-              --arg state "${{ github.event.inputs.state }}" \
-              --argjson num "${{ github.event.inputs.num_jurisdictions }}" \
-              '{state: $state, num_jurisdictions: $num}')")
+          RESPONSE=$(curl -s --fail-with-body \
+            "${CIVICPATCH_ORG_URL}/api/v1/jurisdictions/available?state=${{ github.event.inputs.state }}&num_jurisdictions=${{ github.event.inputs.num_jurisdictions }}" \
+            -H "Authorization: ${SERVICE_API_KEY}")
           echo "matrix=$(echo "$RESPONSE" | jq -c '.jurisdictions')" >> $GITHUB_OUTPUT
 
   scrape:
@@ -49,6 +45,5 @@ jobs:
       fail-fast: false
     uses: ./.github/workflows/data_scrape.yml
     with:
-      jurisdiction_ocdid: ${{ matrix.jurisdiction.jurisdiction_ocdid }}
-      request_id: ${{ matrix.jurisdiction.request_id }}
+      jurisdiction_ocdid: ${{ matrix.jurisdiction.id }}
     secrets: inherit
