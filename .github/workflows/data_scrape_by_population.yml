@@ -11,8 +11,9 @@ on:
           - co
           - mi
           - nj
-          - wa
+          - sc
           - tx
+          - wa
       num_jurisdictions:
         description: "Number of jurisdictions to scrape"
         required: false
