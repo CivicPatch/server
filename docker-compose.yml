@@ -7,6 +7,7 @@ services:
 
       - CIVICPATCH_ORG_URL
       - SERVICE_API_KEY
+      - OPEN_DATA_REPO_URL=https://api.github.com/repos/CivicPatch/open-data
 
       - JOB_RUN_URL
 

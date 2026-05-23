@@ -12,6 +12,7 @@ on:
           - mi
           - nj
           - sc
+          - tn
           - tx
           - wa
       num_jurisdictions:
