@@ -9,6 +9,7 @@ on:
         type: choice
         options:
           - co
+          - ma
           - me
           - mi
           - nc
