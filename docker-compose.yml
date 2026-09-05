@@ -9,8 +9,6 @@ services:
       - SERVICE_API_KEY
       - OPEN_DATA_REPO_URL=https://api.github.com/repos/CivicPatch/open-data
 
-      - JOB_RUN_URL
-
       - LOG_LEVEL=${LOG_LEVEL:-INFO}
       - APP_ROOT=/app
     init: true # https://stackoverflow.com/questions/50634819/xvfb-run-hangs-in-container

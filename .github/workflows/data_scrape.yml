@@ -12,7 +12,7 @@ on:
       url:
         required: false
         type: string
-      request_id:
+      pipeline_run_id:
         required: false
         type: string
       source_urls:
@@ -29,8 +29,8 @@ on:
       url:
         description: "URL of the city council page"
         required: false
-      request_id:
-        description: "If invoking via API, request_id is required to track jobs"
+      pipeline_run_id:
+        description: "If invoking via API, pipeline_run_id is required to track jobs"
         required: false
       source_urls:
         description: "JSON array of specific URLs to scrape (e.g. [\"https://...\"])"
@@ -44,17 +44,6 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Request ${{ inputs.request_id }}
-        env:
-          SERVICE_API_KEY: ${{ secrets.SERVICE_API_KEY }}
-        run: |
-          if [[ -n "${{ inputs.request_id }}" ]]; then
-            curl -s --fail-with-body -X POST "https://civicpatch.org/api/v1/pipeline_runs/${{ inputs.request_id }}/run" \
-              -H "Authorization: ${SERVICE_API_KEY}" \
-              -H "Content-Type: application/json" \
-              -d '{"run_id": ${{ github.run_id }}}'
-          fi
-
       - name: Checkout repository
         uses: actions/checkout@v5
 
@@ -84,17 +73,15 @@ jobs:
         env:
           CIVICPATCH_ORG_URL: https://civicpatch.org
           SERVICE_API_KEY: ${{ secrets.SERVICE_API_KEY }}
-          JOB_RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
 
           GOOGLE_GEMINI_TOKEN: ${{ secrets.GOOGLE_GEMINI_TOKEN }}
           OPEN_ROUTER_TOKEN: ${{ secrets.OPEN_ROUTER_TOKEN }}
           SOURCE_URLS: ${{ inputs.source_urls }}
         run: |
-          echo "Job run URL: $JOB_RUN_URL"
           docker compose run --rm pipelines-cicd python src/interfaces/cli/main.py \
                 run_pipeline \
                 --jurisdiction-ocdid "${{ inputs.jurisdiction_ocdid }}" \
                 --name "${{ inputs.name }}" \
                 --url "${{ inputs.url }}" \
-                --request-id "${{ inputs.request_id }}" \
+                --pipeline-run-id "${{ inputs.pipeline_run_id }}" \
                 --source-urls "$SOURCE_URLS"
