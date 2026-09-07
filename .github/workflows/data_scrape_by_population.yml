@@ -8,7 +8,9 @@ on:
         required: true
         type: choice
         options:
+          - ca
           - co
+          - hi
           - ma
           - me
           - mi
