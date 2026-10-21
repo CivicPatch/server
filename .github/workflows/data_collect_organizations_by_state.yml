@@ -1,0 +1,68 @@
+name: "[manual] - Organizations Collector by State"
+
+# Pipeline 2 for a state: cp.org claims up to num_jurisdictions candidates (jurisdictions whose
+# governing law pipeline 1 collected), registering a run for each, then each runs as
+# data_collect_organizations.yml. Run again for the next bite: claimed jurisdictions leave the
+# candidates for a day.
+
+on:
+  workflow_dispatch:
+    inputs:
+      state:
+        description: "State initials (e.g. vt)"
+        required: true
+        type: string
+      num_jurisdictions:
+        description: "How many to claim; at most 256, GitHub's matrix limit"
+        required: false
+        default: "50"
+        type: string
+
+env:
+  KIND: organizations_collector
+
+jobs:
+  claim:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    outputs:
+      matrix: ${{ steps.claim.outputs.matrix }}
+      count: ${{ steps.claim.outputs.count }}
+    steps:
+      - name: Claim candidates
+        id: claim
+        env:
+          SERVICE_API_KEY: ${{ secrets.SERVICE_API_KEY }}
+          CIVICPATCH_ORG_URL: https://civicpatch.org
+          STATE: ${{ inputs.state }}
+          NUM: ${{ inputs.num_jurisdictions }}
+        run: |
+          if [ "$NUM" -gt 256 ]; then
+            echo "num_jurisdictions is $NUM; a matrix runs at most 256" >&2
+            exit 1
+          fi
+          CAP=$(curl -s --fail-with-body "${CIVICPATCH_ORG_URL}/api/v1/pipeline_runs/${KIND}/budget_cap" \
+            -H "Authorization: ${SERVICE_API_KEY}" | jq -r '.data.cap')
+          if [ "$CAP" != "null" ]; then
+            echo "${KIND}'s ${CAP} cap is reached; nothing claimed" >&2
+            exit 1
+          fi
+          RESPONSE=$(curl -s --fail-with-body -X POST "${CIVICPATCH_ORG_URL}/api/v1/pipeline_runs/${KIND}/claim" \
+            -H "Authorization: ${SERVICE_API_KEY}" -H "Content-Type: application/json" \
+            -d "{\"state\": \"${STATE}\", \"num_jurisdictions\": ${NUM}}")
+          echo "matrix=$(echo "$RESPONSE" | jq -c '.data.jurisdictions')" >> $GITHUB_OUTPUT
+          echo "count=$(echo "$RESPONSE" | jq '.data.jurisdictions | length')" >> $GITHUB_OUTPUT
+
+  collect:
+    needs: claim
+    if: needs.claim.outputs.count != '0'
+    strategy:
+      matrix:
+        claimed: ${{ fromJson(needs.claim.outputs.matrix) }}
+      fail-fast: false
+      max-parallel: 8
+    uses: ./.github/workflows/data_collect_organizations.yml
+    with:
+      jurisdiction_ocdid: ${{ matrix.claimed.jurisdiction_ocdid }}
+      pipeline_run_id: ${{ matrix.claimed.pipeline_run_id }}
+    secrets: inherit
