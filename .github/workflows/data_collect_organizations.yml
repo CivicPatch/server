@@ -1,0 +1,56 @@
+name: "[api] - Organizations Collector"
+
+on:
+  workflow_call:
+    inputs:
+      jurisdiction_ocdid:
+        required: true
+        type: string
+      pipeline_run_id:
+        required: true
+        type: string
+  workflow_dispatch:
+    inputs:
+      jurisdiction_ocdid:
+        description: "ocdid for the municipality (e.g. ocd-jurisdiction/country:us/state:vt/place:stowe/government)"
+        required: true
+      pipeline_run_id:
+        description: "Pipeline run ID for tracking"
+        required: true
+
+jobs:
+  collect:
+    timeout-minutes: 30
+    environment: env-${{ github.actor }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v5
+
+      - name: Set up Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: "3.11"
+
+      - name: Setup mise
+        uses: jdx/mise-action@v4
+        with:
+          version: "2026.3.10"
+          cache: true
+          log_level: debug
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Pull docker image
+        run: |
+          docker compose pull
+          docker images
+
+      - name: Run organizations collector
+        env:
+          CIVICPATCH_ORG_URL: https://civicpatch.org
+          SERVICE_API_KEY: ${{ secrets.SERVICE_API_KEY }}
+        run: |
+          docker compose run --rm pipelines-cicd python src/interfaces/cli/main.py \
+                organizations_collector \
+                --jurisdiction-ocdid "${{ inputs.jurisdiction_ocdid }}" \
+                --pipeline-run-id "${{ inputs.pipeline_run_id }}"
