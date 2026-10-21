@@ -49,6 +49,7 @@ jobs:
         env:
           CIVICPATCH_ORG_URL: https://civicpatch.org
           SERVICE_API_KEY: ${{ secrets.SERVICE_API_KEY }}
+          OPEN_ROUTER_TOKEN: ${{ secrets.OPEN_ROUTER_TOKEN }}
         run: |
           docker compose run --rm pipelines-cicd python src/interfaces/cli/main.py \
                 organizations_collector \
