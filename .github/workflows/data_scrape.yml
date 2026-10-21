@@ -79,7 +79,7 @@ jobs:
           SOURCE_URLS: ${{ inputs.source_urls }}
         run: |
           docker compose run --rm pipelines-cicd python src/interfaces/cli/main.py \
-                run_pipeline \
+                people_collector \
                 --jurisdiction-ocdid "${{ inputs.jurisdiction_ocdid }}" \
                 --name "${{ inputs.name }}" \
                 --url "${{ inputs.url }}" \
