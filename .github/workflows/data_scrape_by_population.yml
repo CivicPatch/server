@@ -21,6 +21,7 @@ on:
           - sc
           - tn
           - tx
+          - vt
           - wa
       num_jurisdictions:
         description: "Number of jurisdictions to scrape"
